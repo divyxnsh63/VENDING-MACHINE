@@ -31,8 +31,8 @@ python vendingg.py
 Project Files
 
 Vending-Machine/
-├── vendingg.py
-└── README.md
+1) vendingg.py
+2) README.md
 
 Python Concepts Used
 Dictionaries, lists, functions, loops, conditions, user input, and basic error handling.
