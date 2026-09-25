@@ -184,7 +184,7 @@ Possible improvements include:
 - Password hashing
 - Permanent sales history
 
-## Author
+## STUDENT
 
 **Divyansh Pal**
 
