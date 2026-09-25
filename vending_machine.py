@@ -1,588 +1,272 @@
-# ==========================================================
-#                 VENDING MACHINE PROJECT
-# ==========================================================
+# Vending Machine Project
 
-# All items are stored as:
-# item number : [item name, price, stock]
-# ==========================================================
+items = {1: ["Tedhe Medhe Aloo Bhujiya",40,5],
+    2: ["Pepsi",40,5],
+    3: ["Dairy Milk Chocolate",50,5],
+    4: ["Nescafe Coffee Latte",60,5],
+    5: ["Lahori Jeera",40,5],
+    6: ["Red Bull",125,5],
+    7: ["Monster Energy - White",150,5],
+    8: ["Doublemint",10,5]}
 
-items = {
-    1: ["Tedhe Medhe Aloo Bhujiya", 40, 5],
-    2: ["Pepsi", 40, 5],
-    3: ["Dairy Milk Chocolate", 50, 5],
-    4: ["Nescafe Coffee Latte", 60, 5],
-    5: ["Lahori Jeera", 40, 5],
-    6: ["Red Bull", 125, 5],
-    7: ["Monster Energy - White", 150, 5],
-    8: ["Doublemint", 10, 5]
-}
+# admin section starts here
+admin_id = "ZORO"
+admin_pass = "26BAI"
 
-
-# ==========================================================
-#                    ADMIN LOGIN
-# ==========================================================
-
-admin_id = "admin"
-admin_password = "1234"
-
+sales = {"total_sales": 0,
+    "total_items": 0,
+    "items_sold": {}}
 
 def admin_login():
-
-    print("\n================================")
-    print("          ADMIN LOGIN")
-    print("================================")
-
-    user_id = input("Enter Admin ID: ")
-    password = input("Enter Password: ")
-
-    if user_id == admin_id and password == admin_password:
-        print("\nLogin successful!")
+    print("\nAdmin Login:")
+    entered_id = input("Enter ID: ")
+    entered_pass = input("Enter password: ")
+    if entered_id == admin_id and entered_pass == admin_pass:
+        print("Login successful!")
         return True
-
-    else:
-        print("\nWrong ID or Password!")
-        return False
+    print("Wrong ID or password!")
+    return False
 
 
-# ==========================================================
-#                    VIEW ITEMS
-# ==========================================================
-
-def view_items():
-
-    print("\n==============================================")
-    print("              AVAILABLE ITEMS")
-    print("==============================================")
-
-    print("No.\tItem\t\t\t\tPrice\tStock")
-    print("----------------------------------------------")
-
-    for number, item in items.items():
-
-        name = item[0]
-        price = item[1]
-        stock = item[2]
-
-        print(number, "\t", name, "\t₹", price, "\t", stock)
-
-    print("----------------------------------------------")
+def show_items():
+    print("\nItems available:")
+    for key in items:
+        item = items[key]
+        print(key, item[0], "₹", item[1], "Stock:", item[2])
 
 
-# ==========================================================
-#                    SEARCH ITEM
-# ==========================================================
-
-def search_item():
-
-    print("\n================================")
-    print("          SEARCH ITEM")
-    print("================================")
-
-    search = input("Enter item name to search: ").lower()
-
+def find_item():
+    print("\nSearch for an item:")
+    search = input("Enter item name: ").lower()
     found = False
-
     for number, item in items.items():
-
-        name = item[0]
-
-        if search in name.lower():
-
-            print("\nItem Found!")
-            print("Item Number :", number)
-            print("Item Name   :", name)
-            print("Price       : ₹", item[1])
-            print("Stock       :", item[2])
-
+        if search in item[0].lower():
+            print("Item number:", number)
+            print("Item:", item[0])
+            print("Price: ₹", item[1])
+            print("Stock:", item[2])
             found = True
-
     if found == False:
-        print("\nItem not found.")
+        print("Item not found.")
 
-
-# ==========================================================
-#                    BUY ITEM
-# ==========================================================
 
 def buy_item():
-
-    view_items()
-
-    try:
-        choice = int(input("\nEnter item number: "))
-
-    except ValueError:
-        print("Please enter a number.")
-        return
+    show_items()
+    choice = int(input("\nEnter item number: "))
 
     if choice not in items:
-
         print("Invalid item number.")
         return
+    item = items[choice]
 
-    name = items[choice][0]
-    price = items[choice][1]
-    stock = items[choice][2]
-
-    if stock <= 0:
-
-        print("\nSorry! This item is out of stock.")
+    if item[2] <= 0:
+        print("This item is out of stock.")
         return
+    print("You selected:", item[0])
+    print("Price: ₹", item[1])
+    print("Stock:", item[2])
 
-    print("\nYou selected:", name)
-    print("Price: ₹", price)
-    print("Available stock:", stock)
+    money = float(input("Enter money: ₹"))
 
-    try:
-        money = float(input("Enter money: ₹"))
-
-    except ValueError:
-        print("Please enter a valid amount.")
+    if money < item[1]:
+        print("Not enough money.")
+        print("You need ₹", item[1] - money, "more.")
         return
+    change = money - item[1]
+    # reduce stock after buying
 
-    if money < price:
-
-        remaining = price - money
-
-        print("\nNot enough money!")
-        print("You need ₹", remaining, "more.")
-
-        return
-
-    # Calculate change
-    change = money - price
-
-    # Reduce stock
-    items[choice][2] -= 1
-
-    # Increase sales information
-    sales["total_sales"] += price
+    item[2] = item[2] - 1
+    sales["total_sales"] += item[1]
     sales["total_items"] += 1
 
-    if name in sales["items_sold"]:
-        sales["items_sold"][name] += 1
-
+    if item[0] in sales["items_sold"]:
+        sales["items_sold"][item[0]] += 1
     else:
-        sales["items_sold"][name] = 1
-
-    print("\n================================")
-    print("       PURCHASE SUCCESSFUL")
-    print("================================")
-
-    print("Item      :", name)
-    print("Price     : ₹", price)
-    print("Money     : ₹", money)
-    print("Change    : ₹", change)
-
-    print("\nThank you for your purchase!")
+        sales["items_sold"][item[0]] = 1
+    print("\nPurchase successful!")
+    print("Item:", item[0])
+    print("Price: ₹", item[1])
+    print("Money: ₹", money)
+    print("Change: ₹", change)
     print("Please collect your item.")
 
-
-# ==========================================================
-#                    ADD STOCK
-# ==========================================================
-
 def add_stock():
-
-    view_items()
-
-    try:
-        choice = int(input("\nEnter item number: "))
-
-    except ValueError:
-        print("Please enter a valid number.")
-        return
+    show_items()
+    choice = int(input("\nEnter item number: "))
 
     if choice not in items:
-
         print("Invalid item number.")
         return
-
-    try:
-        quantity = int(input("Enter quantity to add: "))
-
-    except ValueError:
-        print("Please enter a valid quantity.")
-        return
+    quantity = int(input("Enter quantity to add: "))
 
     if quantity <= 0:
-
         print("Quantity must be greater than zero.")
         return
-
     items[choice][2] += quantity
-
-    print("\nStock updated successfully!")
+    print("Stock updated.")
     print("Item:", items[choice][0])
-    print("New Stock:", items[choice][2])
-
-
-# ==========================================================
-#                    EDIT ITEM
-# ==========================================================
+    print("New stock:", items[choice][2])
 
 def edit_item():
-
-    view_items()
-
-    try:
-        choice = int(input("\nEnter item number to edit: "))
-
-    except ValueError:
-        print("Please enter a valid number.")
-        return
+    show_items()
+    choice = int(input("\nEnter item number: "))
 
     if choice not in items:
-
         print("Invalid item number.")
         return
-
-    print("\nCurrent item details:")
-    print("Name :", items[choice][0])
+    print("\nCurrent details:")
+    print("Name:", items[choice][0])
     print("Price:", items[choice][1])
     print("Stock:", items[choice][2])
-
-    print("\nWhat do you want to edit?")
-    print("1. Item Name")
-    print("2. Item Price")
-    print("3. Item Stock")
+    print("\n1. Change name")
+    print("2. Change price")
+    print("3. Change stock")
     print("4. Cancel")
 
-    option = input("Enter your choice: ")
-
+    option = input("Enter choice: ")
     if option == "1":
-
-        new_name = input("Enter new item name: ")
-
+        new_name = input("Enter new name: ")
         if new_name == "":
-            print("Item name cannot be empty.")
-
+            print("Name cannot be empty.")
         else:
             items[choice][0] = new_name
-            print("Item name updated successfully.")
-
+            print("Name updated.")
     elif option == "2":
-
-        try:
-            new_price = float(input("Enter new price: ₹"))
-
-            if new_price <= 0:
-                print("Price must be greater than zero.")
-
-            else:
-                items[choice][1] = new_price
-                print("Price updated successfully.")
-
-        except ValueError:
-            print("Please enter a valid price.")
-
+        new_price = float(input("Enter new price: ₹"))
+        if new_price <= 0:
+            print("Price must be greater than zero.")
+        else:
+            items[choice][1] = new_price
+            print("Price updated.")
     elif option == "3":
-
-        try:
-            new_stock = int(input("Enter new stock: "))
-
-            if new_stock < 0:
-                print("Stock cannot be negative.")
-
-            else:
-                items[choice][2] = new_stock
-                print("Stock updated successfully.")
-
-        except ValueError:
-            print("Please enter a valid number.")
-
+        new_stock = int(input("Enter new stock: "))
+        if new_stock < 0:
+            print("Stock cannot be negative.")
+        else:
+            items[choice][2] = new_stock
+            print("Stock updated.")
     elif option == "4":
-
         print("Edit cancelled.")
-
     else:
-
         print("Invalid choice.")
 
-
-# ==========================================================
-#                    ADD NEW ITEM
-# ==========================================================
-
 def add_item():
-
-    print("\n================================")
-    print("           ADD NEW ITEM")
-    print("================================")
-
+    print("\nAdd new item")
     new_number = max(items.keys()) + 1
-
     name = input("Enter item name: ")
-
-    if name == "":
-        print("Item name cannot be empty.")
-        return
-
-    try:
-        price = float(input("Enter item price: ₹"))
-        stock = int(input("Enter item stock: "))
-
-    except ValueError:
-        print("Please enter valid values.")
-        return
-
-    if price <= 0:
-
-        print("Price must be greater than zero.")
-        return
-
-    if stock < 0:
-
-        print("Stock cannot be negative.")
-        return
-
-    items[new_number] = [name, price, stock]
-
-    print("\nNew item added successfully!")
-    print("Item Number:", new_number)
-    print("Item Name:", name)
-    print("Price: ₹", price)
-    print("Stock:", stock)
-
-
-# ==========================================================
-#                    REMOVE ITEM
-# ==========================================================
+    price = float(input("Enter price: ₹"))
+    stock = int(input("Enter stock: "))
+    items[new_number] = [name,price,stock]
+    print("New item added.")
+    print("Item number:", new_number)
 
 def remove_item():
-
-    view_items()
-
-    try:
-        choice = int(input("\nEnter item number to remove: "))
-
-    except ValueError:
-        print("Please enter a valid number.")
-        return
-
+    show_items()
+    choice = int(input("\nEnter item number to remove: "))
     if choice not in items:
-
         print("Invalid item number.")
         return
-
-    print("\nYou selected:", items[choice][0])
-
-    confirm = input("Are you sure you want to remove this item? (yes/no): ")
-
+    print("You selected:", items[choice][0])
+    confirm = input("Remove this item? (yes/no): ")
     if confirm.lower() == "yes":
-
-        removed_item = items.pop(choice)
-
-        print("\nItem removed successfully!")
-        print("Removed:", removed_item[0])
-
+        removed = items.pop(choice)
+        print("Item removed:", removed[0])
     else:
-
         print("Item was not removed.")
 
-
-# ==========================================================
-#                    SALES INFORMATION
-# ==========================================================
-
-sales = {
-    "total_sales": 0,
-    "total_items": 0,
-    "items_sold": {}
-}
-
-
-# ==========================================================
-#                    SALES REPORT
-# ==========================================================
-
 def sales_report():
-
-    print("\n================================")
-    print("           SALES REPORT")
-    print("================================")
-
-    print("Total Items Sold :", sales["total_items"])
-    print("Total Sales      : ₹", sales["total_sales"])
-
-    print("\nItems Sold:")
-
+    print("\nSales report")
+    print("Total items sold:", sales["total_items"])
+    print("Total sales: ₹", sales["total_sales"])
     if len(sales["items_sold"]) == 0:
-
-        print("No items have been sold yet.")
-
+        print("No items sold yet.")
     else:
-
         for name, quantity in sales["items_sold"].items():
-
             print(name, ":", quantity)
 
-
-# ==========================================================
-#                    LOW STOCK REPORT
-# ==========================================================
-
-def low_stock_report():
-
-    print("\n================================")
-    print("         LOW STOCK ITEMS")
-    print("================================")
-
+def low_stock():
+    print("\nLow stock items:")
     found = False
-
-    for number, item in items.items():
-
+    for key in items:
+        item = items[key]
         if item[2] <= 2:
-
-            print(number, "-", item[0],
-                  "| Stock:", item[2])
-
+            print(key, item[0], "Stock:", item[2])
             found = True
-
     if found == False:
+        print("No low stock items.")
 
-        print("There are no low-stock items.")
 
-
-# ==========================================================
-#                    USER MENU
-# ==========================================================
-
-def user_menu():
-
+def customer_menu():
     while True:
-
-        print("\n================================")
-        print("         VENDING MACHINE")
-        print("================================")
-
-        print("1. View Items")
-        print("2. Search Item")
-        print("3. Buy Item")
+        print("\nVending Machine")
+        print("1. View items")
+        print("2. Search item")
+        print("3. Buy item")
         print("4. Exit")
-
-        choice = input("\nEnter your choice: ")
-
+        choice = input("Enter choice: ")
         if choice == "1":
-
-            view_items()
-
+            show_items()
         elif choice == "2":
-
-            search_item()
-
+            find_item()
         elif choice == "3":
-
             buy_item()
-
         elif choice == "4":
-
-            print("\nThank you for using the vending machine!")
+            print("Thank you for using the vending machine!")
             break
-
         else:
-
-            print("\nInvalid choice. Please try again.")
-
-
-# ==========================================================
-#                    ADMIN MENU
-# ==========================================================
+            print("Invalid choice.")
 
 def admin_menu():
-
     while True:
-
-        print("\n================================")
-        print("            ADMIN MENU")
-        print("================================")
-
-        print("1. View Items")
-        print("2. Add New Item")
-        print("3. Edit Item")
-        print("4. Remove Item")
-        print("5. Add Stock")
-        print("6. Search Item")
-        print("7. Sales Report")
-        print("8. Low Stock Report")
+        print("\nAdmin Menu")
+        print("1. View items")
+        print("2. Add item")
+        print("3. Edit item")
+        print("4. Remove item")
+        print("5. Add stock")
+        print("6. Search item")
+        print("7. Sales report")
+        print("8. Low stock")
         print("9. Logout")
-
-        choice = input("\nEnter your choice: ")
-
+        choice = input("Enter choice: ")
         if choice == "1":
-
-            view_items()
-
+            show_items()
         elif choice == "2":
-
             add_item()
-
         elif choice == "3":
-
             edit_item()
-
         elif choice == "4":
-
             remove_item()
-
         elif choice == "5":
-
             add_stock()
-
         elif choice == "6":
-
-            search_item()
-
+            find_item()
         elif choice == "7":
-
             sales_report()
-
         elif choice == "8":
-
-            low_stock_report()
-
+            low_stock()
         elif choice == "9":
-
-            print("\nAdmin logged out.")
+            print("Admin logged out.")
             break
-
         else:
+            print("Invalid choice.")
 
-            print("\nInvalid choice. Please try again.")
-
-
-# ==========================================================
-#                    MAIN PROGRAM
-# ==========================================================
+# main program
 
 while True:
-
-    print("\n==========================================")
-    print("           WELCOME TO VENDING MACHINE")
-    print("==========================================")
-
+    print("\nWelcome to Vending Machine")
     print("1. Customer")
     print("2. Admin")
     print("3. Exit")
-
-    choice = input("\nEnter your choice: ")
-
+    choice = input("Enter choice: ")
     if choice == "1":
-
-        user_menu()
-
+        customer_menu()
     elif choice == "2":
-
         if admin_login():
-
             admin_menu()
-
     elif choice == "3":
-
-        print("\nThank you for using our vending machine!")
+        print("Thank you for using the vending machine!")
         print("Have a great day!")
         break
-
     else:
-
-        print("\nInvalid choice. Please select 1, 2 or 3.")
+        print("Invalid choice.")
